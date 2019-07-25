@@ -6,9 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 )
 
 func main() {
+
+	var err error
+	var response *http.Response
+	var bd []BikeData
+
 	fmt.Println("Starting the application...")
 
 	response, err = http.Get("https://data.melbourne.vic.gov.au/resource/tdvh-n9dv.json")
@@ -16,15 +22,22 @@ func main() {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 	} else {
 
-		data, _ := ioutil.ReadAll(response.Body)
-
-		var bd []BikeData
-
-		err := json.Unmarshal(data, &bd)
+		data, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Convert json to BikeData
+		err = json.Unmarshal(data, &bd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		sort.Slice(bd[:], func(i, j int) bool {
+			return bd[i].StationID < bd[j].StationID
+		})
+
+		// Write out table of all bikes in Melbourne
 		for index, element := range bd {
 			fmt.Println(index, "Station Id:", element.StationID, "\tAvailable Bikes: ", element.AvailableBikes, "\t Capacity: ", element.Capacity)
 		}
@@ -34,7 +47,7 @@ func main() {
 }
 
 type BikeData struct {
-	StationID      string `json:"station_id"`
+	StationID      int64  `json:"station_id,string"`
 	AvailableBikes string `json:"available_bikes"`
 	EmptyDocks     string `json:"empty_docks"`
 	Capacity       string `json:"capacity"`
