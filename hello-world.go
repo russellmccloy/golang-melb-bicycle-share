@@ -10,16 +10,7 @@ import (
 
 func main() {
 	fmt.Println("Starting the application...")
-	response, err := http.Get("https://httpbin.org/ip")
-	/*if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-	} else {
-		data, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(string(data))
-	}
-	jsonData := map[string]string{"firstname": "Nic", "lastname": "Raboy"}
-	jsonValue, _ := json.Marshal(jsonData)
-	*/
+
 	response, err = http.Get("https://data.melbourne.vic.gov.au/resource/tdvh-n9dv.json")
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
